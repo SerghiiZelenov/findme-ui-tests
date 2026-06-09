@@ -2,11 +2,11 @@ package com.findme.tests;
 
 import com.findme.base.BaseTest;
 import com.findme.config.ConfigReader;
+import com.findme.pages.AccountPage;
+import com.findme.pages.HomePage;
 import com.findme.pages.LoginPage;
 import com.findme.pages.NavigationBar;
 import org.junit.jupiter.api.Test;
-import com.findme.pages.AccountPage;
-import com.findme.pages.HomePage;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,6 +48,28 @@ public class LoginPageTest extends BaseTest {
         assertTrue(accountPage.isMyOffersSectionVisible(), "My Offers section should be visible after login");
         assertTrue(accountPage.isActiveTabVisible(), "Active tab should be visible after login");
         assertTrue(accountPage.isInactiveTabVisible(), "Inactive tab should be visible after login");
+    }
+
+    @Test
+    public void adminShouldSeeAccountSections() {
+        driver.get(ConfigReader.get("base.url"));
+
+        NavigationBar navigationBar = new NavigationBar(driver);
+        navigationBar.clickLogin();
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(
+                ConfigReader.get("admin.email"),
+                ConfigReader.get("admin.password")
+        );
+
+        AccountPage accountPage = new AccountPage(driver);
+
+        assertTrue(accountPage.isMyOffersSectionVisible(), "My Offers section should be visible");
+        assertTrue(accountPage.isSavedSectionVisible(), "Saved section should be visible");
+        assertTrue(accountPage.isChatsSectionVisible(), "Chats section should be visible");
+        assertTrue(accountPage.isSettingsSectionVisible(), "Settings section should be visible");
+        assertTrue(accountPage.isAdminPanelSectionVisible(), "Admin Panel section should be visible for admin");
     }
 
     @Test
@@ -97,20 +119,9 @@ public class LoginPageTest extends BaseTest {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.clickForgotPasswordLink();
 
-        assertTrue(
-                loginPage.isResetPasswordTitleVisible(),
-                "Reset/Forgot password title should be visible"
-        );
-
-        assertTrue(
-                loginPage.isResetPasswordEmailInputVisible(),
-                "Email input should be visible on reset password form"
-        );
-
-        assertTrue(
-                loginPage.isResetPasswordSubmitButtonVisible(),
-                "Reset password submit button should be visible"
-        );
+        assertTrue(loginPage.isResetPasswordTitleVisible(), "Forgot Password title should be visible");
+        assertTrue(loginPage.isResetPasswordEmailInputVisible(), "Email input should be visible on reset password form");
+        assertTrue(loginPage.isResetPasswordSubmitButtonVisible(), "Reset password submit button should be visible");
     }
 
     @Test
@@ -122,10 +133,7 @@ public class LoginPageTest extends BaseTest {
 
         LoginPage loginPage = new LoginPage(driver);
 
-        assertTrue(
-                loginPage.isEmailInputVisible(),
-                "Email input should be visible on Login page"
-        );
+        assertTrue(loginPage.isEmailInputVisible(), "Email input should be visible on Login page");
 
         navigationBar.clickHome();
 

@@ -2,10 +2,19 @@ package com.findme.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.StaleElementReferenceException;
+
+import java.time.Duration;
+import java.util.List;
 
 public class LoginPage {
 
     private final WebDriver driver;
+    private final WebDriverWait wait;
 
     private final By emailInput = By.cssSelector("input[placeholder='Email']");
     private final By passwordInput = By.cssSelector("input[placeholder='Password']");
@@ -13,81 +22,127 @@ public class LoginPage {
     private final By registerTab = By.xpath("//*[normalize-space()='Register']");
     private final By forgotPasswordLink = By.xpath("//*[contains(text(),'Forgot password')]");
     private final By googleLoginButton = By.xpath("//*[contains(text(),'Continue with Google')]");
+
     private final By nameInput = By.cssSelector("input[placeholder='Name']");
     private final By registerEmailInput = By.cssSelector("input[placeholder='Email']");
     private final By registerPasswordInput = By.cssSelector("input[placeholder='Password']");
     private final By signUpButton = By.xpath("//button[normalize-space()='Sign Up' or normalize-space()='Register']");
-    private final By resetPasswordTitle = By.xpath("//*[contains(text(),'Reset') or contains(text(),'Forgot')]");
+
+    private final By resetPasswordTitle = By.xpath("//*[normalize-space()='Forgot Password']");
     private final By resetPasswordEmailInput = By.cssSelector("input[placeholder='Email address']");
     private final By resetPasswordSubmitButton = By.xpath("//button[.//span[normalize-space()='Send Reset Link']]");
 
     public LoginPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     public boolean isEmailInputVisible() {
-        return driver.findElement(emailInput).isDisplayed();
+        return waitUntilAnyElementVisible(emailInput);
     }
 
     public boolean isPasswordInputVisible() {
-        return driver.findElement(passwordInput).isDisplayed();
+        return waitUntilAnyElementVisible(passwordInput);
     }
 
     public boolean isSignInButtonVisible() {
-        return driver.findElement(signInButton).isDisplayed();
+        return waitUntilAnyElementVisible(signInButton);
     }
 
     public boolean isRegisterTabVisible() {
-        return driver.findElement(registerTab).isDisplayed();
+        return waitUntilAnyElementVisible(registerTab);
     }
 
     public boolean isForgotPasswordLinkVisible() {
-        return driver.findElement(forgotPasswordLink).isDisplayed();
+        return waitUntilAnyElementVisible(forgotPasswordLink);
     }
 
     public boolean isGoogleLoginButtonVisible() {
-        return driver.findElement(googleLoginButton).isDisplayed();
+        return waitUntilAnyElementVisible(googleLoginButton);
     }
 
     public void login(String email, String password) {
-        driver.findElement(emailInput).sendKeys(email);
-        driver.findElement(passwordInput).sendKeys(password);
-        driver.findElement(signInButton).click();
+        WebElement visibleEmailInput = waitUntilVisibleElement(emailInput);
+        visibleEmailInput.sendKeys(email);
+
+        WebElement visiblePasswordInput = waitUntilVisibleElement(passwordInput);
+        visiblePasswordInput.sendKeys(password);
+
+        wait.until(ExpectedConditions.elementToBeClickable(signInButton)).click();
     }
 
     public void clickRegisterTab() {
-        driver.findElement(registerTab).click();
+        wait.until(ExpectedConditions.elementToBeClickable(registerTab)).click();
     }
 
     public boolean isNameInputVisible() {
-        return driver.findElement(nameInput).isDisplayed();
+        return waitUntilAnyElementVisible(nameInput);
     }
 
     public boolean isRegisterEmailInputVisible() {
-        return driver.findElement(registerEmailInput).isDisplayed();
+        return waitUntilAnyElementVisible(registerEmailInput);
     }
 
     public boolean isRegisterPasswordInputVisible() {
-        return driver.findElement(registerPasswordInput).isDisplayed();
+        return waitUntilAnyElementVisible(registerPasswordInput);
     }
 
     public boolean isSignUpButtonVisible() {
-        return driver.findElement(signUpButton).isDisplayed();
+        return waitUntilAnyElementVisible(signUpButton);
     }
 
     public void clickForgotPasswordLink() {
-        driver.findElement(forgotPasswordLink).click();
+        wait.until(ExpectedConditions.elementToBeClickable(forgotPasswordLink)).click();
     }
 
     public boolean isResetPasswordTitleVisible() {
-        return driver.findElement(resetPasswordTitle).isDisplayed();
+        return waitUntilAnyElementVisible(resetPasswordTitle);
     }
 
     public boolean isResetPasswordEmailInputVisible() {
-        return driver.findElement(resetPasswordEmailInput).isDisplayed();
+        return waitUntilAnyElementVisible(resetPasswordEmailInput);
     }
 
     public boolean isResetPasswordSubmitButtonVisible() {
-        return driver.findElement(resetPasswordSubmitButton).isDisplayed();
+        return waitUntilAnyElementVisible(resetPasswordSubmitButton);
+    }
+
+    private boolean waitUntilAnyElementVisible(By locator) {
+        try {
+            wait.until(driver -> {
+                List<WebElement> elements = driver.findElements(locator);
+
+                for (WebElement element : elements) {
+                    try {
+                        if (element.isDisplayed()) {
+                            return true;
+                        }
+                    } catch (StaleElementReferenceException e) {
+                        return false;
+                    }
+                }
+                return false;
+            });
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    private WebElement waitUntilVisibleElement(By locator) {
+        return wait.until(driver -> {
+            List<WebElement> elements = driver.findElements(locator);
+
+            for (WebElement element : elements) {
+                try {
+                    if (element.isDisplayed()) {
+                        return element;
+                    }
+                } catch (StaleElementReferenceException e) {
+                    return null;
+                }
+            }
+            return null;
+        });
     }
 }

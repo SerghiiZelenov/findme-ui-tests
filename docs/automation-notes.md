@@ -1,566 +1,540 @@
-mkdir -p docs
-
-cat > docs/automation-notes.md <<'EOF'
 # FindMe UI Automation Notes
 
-## 1. Current automation stack
+Working notes for the Selenium UI automation project.
 
-- Java 21
-- Maven
-- Selenium WebDriver
-- JUnit 5
-- WebDriverManager
-- IntelliJ IDEA
+This file contains the current automation status, important implementation details, known temporary solutions, and future QA tasks.
 
-## 2. Project location
+## Current Status
 
-Local automation project:
+The current UI smoke suite is stable and passes locally.
 
+Latest full smoke run:
+
+```text
+Tests run: 18
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
+```
+
+Last verified locally:
+
+```text
+2026-06-10
+```
+
+Branch:
+
+```text
+serhii
+```
+
+Latest relevant commit:
+
+```text
+00ca881 - Stabilize UI smoke tests for login and offers
+```
+
+Repository:
+
+```text
+https://github.com/SerghiiZelenov/findme-ui-tests
+```
+
+## Local Project Paths
+
+Backend:
+
+```text
+/Users/sergej/QA_Projects/FindMe/findme-back
+```
+
+Frontend:
+
+```text
+/Users/sergej/QA_Projects/FindMe/findme-front
+```
+
+UI tests:
+
+```text
 /Users/sergej/QA_Projects/FindMe/findme-ui-tests
+```
 
-Recommended local structure:
+Recommended structure:
 
+```text
 FindMe/
 ├── findme-back
 ├── findme-front
 └── findme-ui-tests
+```
 
-The Selenium UI automation project is stored separately from frontend and backend repositories.
+## Local Environment
 
-Reason:
+Frontend URL:
 
-- frontend repository contains application code
-- backend repository contains API/server code
-- UI automation repository contains Selenium tests
-- this structure is cleaner for portfolio and interview demonstration
-
-## 3. Test environment
-
-Frontend local URL:
-
+```text
 http://localhost:3000/main
+```
 
-Backend local API:
+Backend API:
 
+```text
 http://localhost:8080/api
+```
 
-Frontend local configuration file:
+Frontend `.env.local` should contain:
 
-findme-front/.env.local
-
-Required frontend environment variable:
-
+```text
 NEXT_PUBLIC_API_URL=http://localhost:8080/api
+```
 
-For UI tests to work correctly, both services should be running:
+## Start Commands
 
-frontend: npm run dev
-backend:  npm run start:dev
+Start backend:
 
-## 4. Current automation project structure
+```bash
+cd /Users/sergej/QA_Projects/FindMe/findme-back
+npm run start:dev
+```
 
-src/test/java/com/findme
-├── base
-│   └── BaseTest.java
-├── config
-│   └── ConfigReader.java
-├── pages
-│   ├── HomePage.java
-│   ├── NavigationBar.java
-│   └── CategoriesPage.java
-├── tests
-│   ├── HomePageTest.java
-│   └── CategoriesPageTest.java
-└── utils
+Start frontend:
 
-src/test/resources
-└── config.properties
+```bash
+cd /Users/sergej/QA_Projects/FindMe/findme-front
+npm run dev
+```
 
-## 5. Current config.properties
+Run all UI tests:
 
+```bash
+cd /Users/sergej/QA_Projects/FindMe/findme-ui-tests
+mvn test
+```
+
+Run Offers tests only:
+
+```bash
+mvn -Dtest=OffersPageTest test
+```
+
+Run Login tests only:
+
+```bash
+mvn -Dtest=LoginPageTest test
+```
+
+## Test Configuration
+
+Config file:
+
+```text
+src/test/resources/config.properties
+```
+
+Current local config:
+
+```properties
 base.url=http://localhost:3000/main
 browser=chrome
 headless=false
 
 admin.email=admin@example.com
 admin.password=88888888
-
-## 6. Current implemented tests
-
-### HomePageTest
-
-Current checks:
-
-- Home page opens successfully
-- Hero title is visible
-- Find Your Match search is visible
-- Navigation menu is visible
-
-Current tested navigation links:
-
-- Home
-- Categories
-- Offers
-- Map
-- Login
-
-### CategoriesPageTest
-
-Current checks:
-
-- Home page opens
-- User clicks Categories in navigation menu
-- Categories page opens
-- Categories page title is visible
-- "Education" category is visible
-
-## 7. Current test result
-
-Current Selenium test status:
-
-Tests run: 3
-Failures: 0
-Errors: 0
-Skipped: 0
-BUILD SUCCESS
-
-Implemented working tests:
-
-- HomePageTest
-- CategoriesPageTest
-
-## 8. Important note about browser closing
-
-In BaseTest.java, browser closing is controlled by:
-
-@AfterEach
-public void tearDown() {
-if (driver != null) {
-driver.quit();
-}
-}
-
-For learning/debugging, this block may be temporarily commented out:
-
-//    @AfterEach
-//    public void tearDown() {
-//        if (driver != null) {
-//            driver.quit();
-//        }
-//    }
-
-Important:
-
-This should be restored later, otherwise Chrome windows will remain open after each test run.
-
-## 9. Current known warnings
-
-During test execution, these warnings may appear:
-
-SLF4J(W): No SLF4J providers were found.
-
-and:
-
-WARNING: Unable to find CDP implementation matching 148
-
-Current decision:
-
-- these warnings do not break tests
-- tests are passing
-- no immediate action is needed
-
-## 10. Known issue: unstable category assertion
-
-Current CategoriesPageTest checks a specific category name:
-
-Education
-
-This is a temporary assertion.
-
-Risk:
-
-- the category can be renamed
-- the category can be deleted from the database
-- backend seed data can change
-- test data can differ between environments
-- this makes the test dependent on specific content instead of page behavior
-
-Better approach:
-
-Instead of checking a specific category name, check that at least one category card is visible.
-
-Recommended future test logic:
-
-Open Home page
-Click Categories
-Check Categories page title
-Check that category cards count > 0
-
-Preferred stable locator:
-
-data-testid="category-card"
-
-Recommended future Selenium logic:
-
-List<WebElement> cards = driver.findElements(By.cssSelector("[data-testid='category-card']"));
-assertTrue(cards.size() > 0, "At least one category card should be visible");
-
-## 11. Current locator strategy
-
-At the moment, the frontend does not have stable data-testid attributes for the elements we inspected.
-
-Example from Login email input:
-
-<input placeholder="Email" class="AuthModal-module__...__input" type="email" value="">
-
-Current issue:
-
-- no data-testid
-- no id
-- no name
-- no aria-label
-- CSS module classes are auto-generated and unstable
-
-Temporary locators may use:
-
-By.xpath("//a[contains(text(),'Categories')]")
-By.xpath("//*[contains(text(),'One Planet')]")
-By.cssSelector("input[placeholder='Email']")
-By.cssSelector("input[type='password']")
-
-These locators are acceptable temporarily, but should be replaced later.
-
-## 12. Recommended data-testid attributes
-
-To make Selenium tests stable, frontend should add data-testid attributes.
-
-### Navigation
-
-- nav-home-link
-- nav-categories-link
-- nav-offers-link
-- nav-map-link
-- nav-login-link
-- nav-logout-button
-
-### Home page
-
-- home-hero-title
-- home-search-input
-- home-search-button
-
-### Find Your Match modal
-
-- find-match-modal
-- find-match-keyword-input
-- find-match-country-input
-- find-match-country-option
-- find-match-city-input
-- find-match-radius-select
-- find-match-category-select
-- find-match-search-button
-- find-match-close-button
-
-### Categories page
-
-- categories-page-title
-- category-card
-- category-card-title
-
-### Offers / Create offer
-
-- create-offer-cta
-- create-offer-form
-- offer-title-input
-- offer-description-input
-- offer-category-select
-- offer-tags-input
-- offer-submit-button
-- offer-delete-button
-
-### Map page
-
-- map-container
-- map-marker
-- map-marker-popup
-- map-zoom-in-button
-- map-zoom-out-button
-- map-layer-control
-- map-day-night-toggle
-
-### Login / Register
-
-- login-email-input
-- login-password-input
-- login-submit-button
-- register-tab
-- register-name-input
-- register-email-input
-- register-password-input
-- register-submit-button
-- forgot-password-link
-- google-login-button
+```
+
+Important note:
+
+Regular user credentials are not yet fixed in the test config. Current stable authenticated smoke checks use admin credentials.
+
+## Current Test Classes
+
+```text
+src/test/java/com/findme/tests/HomePageTest.java
+src/test/java/com/findme/tests/CategoriesPageTest.java
+src/test/java/com/findme/tests/FindMatchModalTest.java
+src/test/java/com/findme/tests/MapPageTest.java
+src/test/java/com/findme/tests/LoginPageTest.java
+src/test/java/com/findme/tests/OffersPageTest.java
+```
+
+## Current Page Objects
+
+```text
+src/test/java/com/findme/pages/HomePage.java
+src/test/java/com/findme/pages/NavigationBar.java
+src/test/java/com/findme/pages/CategoriesPage.java
+src/test/java/com/findme/pages/FindMatchModal.java
+src/test/java/com/findme/pages/MapPage.java
+src/test/java/com/findme/pages/LoginPage.java
+src/test/java/com/findme/pages/AccountPage.java
+src/test/java/com/findme/pages/OffersPage.java
+```
+
+## Current Smoke Coverage
+
+The current smoke suite covers:
+
+```text
+Home page opens
+Home hero/search area is visible
+Navigation menu is visible
+Categories page opens
+Category card opens Find Your Match modal
+Map page opens
+Offers page opens
+Guest user clicks Create Volunteer Offer and is redirected to Login
+Logged-in user clicks Create Volunteer Offer and the create offer form opens
+Login page opens
+Admin login works
+Admin account sections are visible after login
+Admin logout works
+Register tab opens
+Forgot Password page opens
+Navigation from Login page back to Home works
+Find Your Match modal opens from Home search
+Required country behavior in Find Your Match modal
+Radius appears after valid country and city are entered
+```
+
+## Important Fixes Already Done
+
+### Login flow
+
+Problem:
+
+The tests sometimes continued before the login state was fully ready.
+
+Fix:
+
+After login, tests now wait for authenticated UI state, especially the `Logout` button.
+
+Important idea:
+
+```text
+Do not continue to account/offers checks until Logout is visible.
+```
 
 ### Account page
 
-- account-page
-- account-email
-- account-my-offers-tab
-- account-active-offers-tab
-- account-inactive-offers-tab
-- account-saved-tab
-- account-settings-tab
+Account smoke was updated to check visible authenticated account sections.
 
-## 13. Current frontend business logic to cover later
+Currently checked admin account sections include:
 
-### Home search
+```text
+My Offers
+Saved
+Chats
+Settings
+Admin Panel
+Logout
+```
 
-Home page has a search field:
+### Offers / Create Volunteer Offer
 
-Find Your Match...
+Problem:
 
-Clicking this field opens the Find Your Match modal.
+The Create Volunteer Offer button was visible, but Selenium did not reliably open the form when clicking the parent button.
 
-### Find Your Match modal
+Manual click worked.
 
-Fields:
+Investigation result:
 
-- keyword/tag search — optional
-- country — required
-- country autocomplete starts after entering 2 characters
-- country input is in English
-- city — optional
-- radius appears only after city is entered
-- category — optional
+The reliable click target on the current frontend is the inner text span:
 
-After clicking Search, user is redirected to Map with offers filtered by selected criteria.
+```java
+By.cssSelector("[class*='addText']")
+```
 
-If no offers are found, user sees a modal:
+Current temporary solution in `OffersPage.java`:
 
-No offers found
-Try another category, keyword, city, or a larger search radius.
+```java
+private final By createOfferButton = By.cssSelector("[class*='addText']");
+```
 
-### Categories
+Click method:
 
-Categories page shows cards of available categories.
-
-Clicking a category card opens the same Find Your Match modal with the selected category prefilled.
-
-### Offers
-
-Offers page will be used for creating volunteer offers.
-
-Expected logic:
-
-- guest user clicks create offer
-- guest user is redirected to Login/Register
-- registered user clicks create offer
-- registered user sees create offer form
-
-### Map
-
-Map page shows available offers as pins/markers.
-
-Expected checks later:
-
-- map opens
-- map container is visible
-- markers are visible if offers exist
-- marker hover shows short offer preview
-- map zoom controls are visible
-- layer controls are visible
-- day/night mode control is visible
-
-### Login
-
-Login page allows:
-
-- login
-- registration
-- Google login
-- password reset
-
-Google login and real password reset email flow should not be automated until the team confirms stable test setup.
-
-## 14. Recommended next test priorities
-
-Recommended order:
-
-1. Improve CategoriesPageTest to check category cards instead of specific category name.
-2. Add LoginPage Page Object.
-3. Add login test with admin user.
-4. Add logout test.
-5. Add Find Your Match modal opening test.
-6. Add country required validation test.
-7. Add country autocomplete test.
-8. Add radius visibility after city input test.
-9. Add Map page smoke test.
-10. Add Offers guest redirect test.
-
-## 15. Temporary decisions
-
-Current temporary decisions:
-
-- Tests are running against local frontend: http://localhost:3000/main
-- Frontend uses local backend: http://localhost:8080/api
-- Category check uses "Education" temporarily
-- Browser closing may be temporarily disabled for learning/debugging
-- data-testid attributes are not yet available
-- XPath/text/placeholder locators are used temporarily
-  EOF
-## 16. Smoke suite status update
-
-Date: 2026-06-09
-
-Current full Selenium smoke suite result:
-
-Tests run: 16
-Failures: 0
-Errors: 0
-Skipped: 1
-BUILD SUCCESS
-
-Meaning:
-
-- 15 active UI tests passed successfully
-- 1 test is skipped intentionally
-- No failed tests
-- No Selenium errors
-
-The skipped test is related to Offers / Create Offer flow.
+```java
+public void clickCreateOfferButton() {
+    WebElement buttonText = waitUntilVisibleElement(createOfferButton);
+    buttonText.click();
+}
+```
 
 Reason:
 
-Offers / Create Offer functionality is not fully implemented on the frontend yet, therefore the test is marked as:
+The actual working click target during Selenium run was:
 
-@Disabled("Blocked: Offers/Create Offer functionality is not implemented yet")
+```text
+SUCCESS with normal click: addText span
+```
 
-## 17. Current active smoke coverage
+Important:
 
-Current smoke tests cover:
+This is a temporary selector. It should be replaced later with a stable `data-testid`.
 
-- Home page opens
-- Home hero title is visible
-- Find Your Match search is visible
-- Navigation menu is visible
-- Categories page opens
-- Category card opens Find Your Match modal
-- Offers page opens
-- Map page opens
-- Login page opens
-- Admin login works
-- Admin logout works
-- Register tab opens
-- Forgot Password page opens
-- Find Your Match modal opens from Home search
-- Required country behavior in Find Your Match modal
-- Radius appears after valid country and city are entered
-- Navigation from Login page back to Home works
+Recommended future selector:
 
-## 18. Important implementation notes from smoke phase
+```java
+By.cssSelector("[data-testid='create-volunteer-offer-button']")
+```
 
-### Login route
+The `data-testid` should be placed on the actual clickable button element.
 
-Login navigation link points to:
+## Data-testid Status
 
-/account
+Stable `data-testid` attributes are not yet available on the current `dev` branch.
 
-It does not use:
+A developer branch may already contain some `data-testid` implementation, but it is not yet merged into `dev`.
 
-/login
+Until that is merged, current tests use temporary selectors:
 
-Therefore tests should not check that URL contains "login".
+```text
+text locators
+XPath locators
+placeholder-based CSS selectors
+partial CSS module class selectors
+```
 
-Correct approach:
+After merge, replace temporary selectors gradually.
 
-- check that Login UI is visible
-- check email input
-- check password input
-- check Sign In button
+Priority elements for `data-testid`:
 
-### Forgot Password page
+```text
+navigation-home-link
+navigation-categories-link
+navigation-offers-link
+navigation-map-link
+navigation-login-link
+logout-button
+login-email-input
+login-password-input
+login-submit-button
+register-tab
+forgot-password-link
+find-match-search-input
+find-match-modal
+country-input
+city-input
+radius-select
+category-card
+create-volunteer-offer-button
+create-offer-title-input
+create-offer-description-textarea
+create-offer-city-input
+create-offer-country-input
+create-offer-submit-button
+create-offer-cancel-button
+```
 
-Forgot Password page contains:
+## Known Warnings
 
-- title: Forgot Password
-- email input placeholder: Email address
-- submit button text: Send Reset Link
+During test runs Selenium prints warnings like:
 
-The button text is inside a span inside the button.
-
-Working locator:
-
-//button[.//span[normalize-space()='Send Reset Link']]
-
-### Find Your Match country autocomplete
-
-Typing country text is not enough.
-
-Country must be selected from autocomplete suggestion.
-
-Working logic:
-
-- type country name
-- click exact visible suggestion
-
-Example:
-
-Germany must be clicked as a suggestion, otherwise frontend still shows:
-
-Please select a country
-
-### Radius field
-
-Radius does not appear as a field with text "Radius".
-
-Current temporary locator checks visible "km" text.
-
-This is temporary and should be replaced with data-testid later.
-
-## 19. Current blocked functionality
-
-### Offers / Create Offer
-
-Planned test:
-
-Guest clicks Create Offer → redirected to Login/Register
+```text
+Unable to find CDP implementation matching 149
+```
 
 Current status:
 
-Blocked / skipped
+```text
+Not blocking
+Tests pass successfully
+Can be ignored for now
+```
 
 Reason:
 
-Frontend functionality is not implemented yet.
+Chrome version is newer than the Selenium DevTools helper available in the current dependency set.
 
-Future expected behavior:
+Possible future improvement:
 
-- guest user opens Offers
-- guest clicks Create Offer
-- user is redirected to Login/Register
-- registered user clicks Create Offer
-- create offer form opens
+Update Selenium dependencies or add a matching DevTools artifact if CDP-based features are needed.
 
-## 20. Current cleanup reminder
+## Current Stable Result by Test Class
 
-Temporary Thread.sleep calls should not remain in final smoke tests.
+Latest observed successful run:
 
-If Thread.sleep was used only for visual debugging, remove it before committing.
+```text
+OffersPageTest:       3 passed
+MapPageTest:          1 passed
+CategoriesPageTest:   2 passed
+FindMatchModalTest:   3 passed
+HomePageTest:         2 passed
+LoginPageTest:        7 passed
 
-Preferred future approach:
+Total: 18 passed
+Failures: 0
+Errors: 0
+Skipped: 0
+```
 
-- WebDriverWait
-- ExpectedConditions
-- stable data-testid locators
+## Git Status
 
-## 21. Recommended next steps
+Latest pushed commit for test stabilization:
 
-Next recommended work after first smoke suite:
+```text
+00ca881 - Stabilize UI smoke tests for login and offers
+```
 
-1. Commit current working Selenium project to Git.
-2. Add README.md with setup and run instructions.
-3. Replace fragile text/XPath locators with data-testid after frontend team adds them.
-4. Move search filtering checks to regression tests.
-5. Move Create Offer flow to e2e tests after frontend implementation is ready.
-6. Keep smoke suite small, fast, and stable.
+After that, README was updated separately or prepared for update.
 
+Before committing future changes, always run:
+
+```bash
+git status
+mvn test
+```
+
+Recommended commit for documentation update:
+
+```bash
+git add README.md docs/automation-notes.md
+git commit -m "Update UI automation documentation"
+git push
+```
+
+## Smoke vs Regression Decision
+
+Current smoke tests should stay short and stable.
+
+Smoke should check:
+
+```text
+main pages open
+navigation works
+basic login/logout works
+critical modals/forms open
+guest redirect works
+authenticated create-offer entry opens
+```
+
+Smoke should not deeply check:
+
+```text
+all validation combinations
+all search filters
+all categories/tags
+create offer full submit flow
+database cleanup
+chat workflows
+saved offers management
+profile update
+password update
+delete account
+email verification
+```
+
+Those belong to regression/e2e tests.
+
+## Future Test Plan
+
+### Near-term
+
+```text
+Replace temporary selectors with data-testid after merge into dev
+Add regular user credentials to config.properties
+Add regular user account smoke
+Add Create Offer validation checks
+Add Create Offer positive submit test with cleanup
+```
+
+### Account page
+
+Future account checks:
+
+```text
+Saved section opens
+Chats section opens
+Settings section opens
+Profile update form is visible
+Change password form is visible
+Delete account action is protected
+```
+
+### Offers
+
+Future offers checks:
+
+```text
+Create Offer required fields validation
+Create Offer category selection
+Create Offer tags input
+Create Offer location fields
+Create Offer active/inactive status
+Create Offer submit success
+Created offer appears in My Offers
+Created offer can be cleaned up after test
+```
+
+### Search / Find Your Match
+
+Future regression checks:
+
+```text
+country autocomplete after 2 characters
+country required validation
+city optional behavior
+radius appears only after city
+category preselection from Categories page
+keyword search
+no-results modal
+redirect to Map after search
+```
+
+### Map
+
+Future regression checks:
+
+```text
+map loads pins
+hover on pin shows offer preview
+favorite icon behavior
+map controls are visible
+day/night mode if stable
+```
+
+### Security / Requirement Gap
+
+Email verification after registration is an important future requirement.
+
+Expected behavior:
+
+```text
+New user registration requires email verification
+Unverified user cannot fully access account functions
+Unverified user cannot create offers
+Unverified user cannot abuse chats or user-facing features
+Verified user can access full functionality
+Invalid or expired verification link shows an error
+```
+
+This is not implemented yet and should be tracked as a requirement gap / future security test area.
+
+## Important Notes for Future Sessions
+
+Use current `dev` branch for frontend/backend unless specifically testing a feature branch.
+
+Do not assume selectors are stable until `data-testid` attributes are merged into `dev`.
+
+If a UI test fails after frontend changes, first check:
+
+```text
+Was the frontend updated?
+Was the backend updated?
+Is the backend running?
+Is the frontend using local backend API?
+Did the selector change?
+Is the user really authenticated before the next action?
+Does the same action work manually?
+```
+
+For authenticated UI actions, always verify authenticated state before continuing:
+
+```text
+Logout button visible
+Account page available
+Admin/User name visible in navbar
+```

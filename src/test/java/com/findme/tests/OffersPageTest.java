@@ -8,6 +8,7 @@ import com.findme.pages.NavigationBar;
 import com.findme.pages.OffersPage;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import com.findme.pages.CreateOfferPage;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -81,34 +82,35 @@ public class OffersPageTest extends BaseTest {
 
         OffersPage offersPage = new OffersPage(driver);
         offersPage.clickCreateOfferButton();
+        CreateOfferPage createOfferPage = new CreateOfferPage(driver);
 
         assertTrue(
-                offersPage.isOfferTitleInputVisible(),
+                createOfferPage.isTitleInputVisible(),
                 "Offer title input should be visible in Create Volunteer Offer form"
         );
 
         assertTrue(
-                offersPage.isDescriptionTextareaVisible(),
+                createOfferPage.isDescriptionTextareaVisible(),
                 "Description textarea should be visible in Create Volunteer Offer form"
         );
 
         assertTrue(
-                offersPage.isCityInputVisible(),
+                createOfferPage.isCityInputVisible(),
                 "City input should be visible in Create Volunteer Offer form"
         );
 
         assertTrue(
-                offersPage.isCountryInputVisible(),
+                createOfferPage.isCountryInputVisible(),
                 "Country input should be visible in Create Volunteer Offer form"
         );
 
         assertTrue(
-                offersPage.isCreateButtonVisible(),
+                createOfferPage.isCreateButtonVisible(),
                 "Create button should be visible in Create Volunteer Offer form"
         );
 
         assertTrue(
-                offersPage.isCancelButtonVisible(),
+                createOfferPage.isCancelButtonVisible(),
                 "Cancel button should be visible in Create Volunteer Offer form"
         );
     }

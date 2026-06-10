@@ -2,13 +2,13 @@
 
 Selenium UI automation project for the FindMe web application.
 
-This repository contains automated UI smoke tests for the FindMe frontend.
+This repository contains automated UI smoke and functional tests for the FindMe frontend.
 
 ## Project Purpose
 
-The goal of this project is to provide a stable UI smoke test suite for the main FindMe user flows.
+The goal of this project is to provide a stable UI smoke and functional test suite for the main FindMe user flows.
 
-The current smoke suite checks that the main pages, navigation, login flow, search modal, map page, categories page, offers page, and create-offer entry flow work correctly after local frontend/backend startup.
+The current suite checks that the main pages, navigation, login flow, search modal, map page, categories page, offers page, create-offer entry flow, and basic Create Offer form behavior work correctly after local frontend/backend startup.
 
 ## Tech Stack
 
@@ -114,7 +114,7 @@ Run Offers page tests:
 mvn -Dtest=OffersPageTest test
 ```
 
-## Current Smoke Test Coverage
+## Current Test Coverage
 
 The current smoke suite covers:
 
@@ -127,6 +127,8 @@ The current smoke suite covers:
 - Offers page opens
 - Guest user clicks Create Volunteer Offer and is redirected to Login
 - Logged-in user clicks Create Volunteer Offer and the create offer form opens
+- Logged-in user sees the main Create Offer form fields
+- Cancel button closes the Create Offer form
 - Login page opens
 - Admin login works
 - Admin account sections are visible after login
@@ -143,7 +145,7 @@ The current smoke suite covers:
 Latest full smoke suite result:
 
 ```text
-Tests run: 18
+Tests run: 20
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -169,6 +171,7 @@ src/test/java/com/findme/pages/MapPage.java
 src/test/java/com/findme/pages/LoginPage.java
 src/test/java/com/findme/pages/AccountPage.java
 src/test/java/com/findme/pages/OffersPage.java
+src/test/java/com/findme/pages/CreateOfferPage.java
 ```
 
 Main test classes:
@@ -180,6 +183,7 @@ src/test/java/com/findme/tests/FindMatchModalTest.java
 src/test/java/com/findme/tests/MapPageTest.java
 src/test/java/com/findme/tests/LoginPageTest.java
 src/test/java/com/findme/tests/OffersPageTest.java
+src/test/java/com/findme/tests/CreateOfferTest.java
 ```
 
 ## Known Technical Notes

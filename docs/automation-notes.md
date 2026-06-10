@@ -6,12 +6,12 @@ This file contains the current automation status, important implementation detai
 
 ## Current Status
 
-The current UI smoke suite is stable and passes locally.
+The current UI smoke and functional suite is stable and passes locally.
 
 Latest full smoke run:
 
 ```text
-Tests run: 18
+Tests run: 20
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -33,7 +33,7 @@ serhii
 Latest relevant commit:
 
 ```text
-00ca881 - Stabilize UI smoke tests for login and offers
+e2a49d3 - Add create offer cancel functional test
 ```
 
 Repository:
@@ -158,6 +158,7 @@ src/test/java/com/findme/tests/FindMatchModalTest.java
 src/test/java/com/findme/tests/MapPageTest.java
 src/test/java/com/findme/tests/LoginPageTest.java
 src/test/java/com/findme/tests/OffersPageTest.java
+src/test/java/com/findme/tests/CreateOfferTest.java
 ```
 
 ## Current Page Objects
@@ -171,6 +172,7 @@ src/test/java/com/findme/pages/MapPage.java
 src/test/java/com/findme/pages/LoginPage.java
 src/test/java/com/findme/pages/AccountPage.java
 src/test/java/com/findme/pages/OffersPage.java
+src/test/java/com/findme/pages/CreateOfferPage.java
 ```
 
 ## Current Smoke Coverage
@@ -187,6 +189,8 @@ Map page opens
 Offers page opens
 Guest user clicks Create Volunteer Offer and is redirected to Login
 Logged-in user clicks Create Volunteer Offer and the create offer form opens
+Logged-in user sees all main Create Offer form fields
+Cancel button closes the Create Offer form
 Login page opens
 Admin login works
 Admin account sections are visible after login
@@ -359,13 +363,14 @@ Latest observed successful run:
 
 ```text
 OffersPageTest:       3 passed
+CreateOfferTest:      2 passed
 MapPageTest:          1 passed
 CategoriesPageTest:   2 passed
 FindMatchModalTest:   3 passed
 HomePageTest:         2 passed
 LoginPageTest:        7 passed
 
-Total: 18 passed
+Total: 20 passed
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -373,13 +378,13 @@ Skipped: 0
 
 ## Git Status
 
-Latest pushed commit for test stabilization:
+Latest pushed commit for Create Offer functional coverage:
 
 ```text
-00ca881 - Stabilize UI smoke tests for login and offers
+e2a49d3 - Add create offer cancel functional test
 ```
 
-After that, README was updated separately or prepared for update.
+After that, README and automation notes were updated to reflect 20 passing tests.
 
 Before committing future changes, always run:
 

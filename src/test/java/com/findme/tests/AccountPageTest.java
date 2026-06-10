@@ -109,4 +109,32 @@ public class AccountPageTest extends BaseTest {
         assertTrue(accountPage.isActiveTabVisible(), "Active tab should be visible");
         assertTrue(accountPage.isInactiveTabVisible(), "Inactive tab should be visible");
     }
+
+    @Test
+    public void regularUserShouldOpenSavedSection() {
+        String userEmail = System.getenv("FINDME_USER_EMAIL");
+        String userPassword = System.getenv("FINDME_USER_PASSWORD");
+
+        assumeTrue(
+                userEmail != null && !userEmail.isBlank()
+                        && userPassword != null && !userPassword.isBlank(),
+                "Regular user credentials are not provided. Set FINDME_USER_EMAIL and FINDME_USER_PASSWORD."
+        );
+
+        driver.get(ConfigReader.get("base.url"));
+
+        NavigationBar navigationBar = new NavigationBar(driver);
+        navigationBar.clickLogin();
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(userEmail, userPassword);
+
+        AccountPage accountPage = new AccountPage(driver);
+
+        assertTrue(accountPage.isSavedSectionVisible(), "Saved section should be visible");
+
+        accountPage.clickSavedSection();
+
+        assertTrue(accountPage.isSavedSectionVisible(), "Saved section should remain visible after click");
+    }
 }

@@ -111,4 +111,8 @@ public class AccountPage {
                 .stream()
                 .noneMatch(WebElement::isDisplayed);
     }
+
+    public void clickSavedSection() {
+        waitUntilVisibleElement(savedSection).click();
+    }
 }

@@ -105,4 +105,10 @@ public class AccountPage {
             return null;
         });
     }
+
+    public boolean isAdminPanelSectionNotVisible() {
+        return driver.findElements(adminPanelSection)
+                .stream()
+                .noneMatch(WebElement::isDisplayed);
+    }
 }

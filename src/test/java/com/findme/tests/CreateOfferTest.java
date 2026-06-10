@@ -198,4 +198,110 @@ public class CreateOfferTest extends BaseTest {
                 "Create Offer form should remain open after submitting empty required fields"
         );
     }
+
+    @Test
+    public void loggedInUserShouldNotCreateOfferWithoutTitle() {
+        driver.get(ConfigReader.get("base.url"));
+
+        NavigationBar navigationBar = new NavigationBar(driver);
+        navigationBar.clickLogin();
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(
+                ConfigReader.get("admin.email"),
+                ConfigReader.get("admin.password")
+        );
+
+        AccountPage accountPage = new AccountPage(driver);
+
+        assertTrue(
+                accountPage.isLogoutButtonVisible(),
+                "Logout button should be visible after login"
+        );
+
+        navigationBar.clickOffers();
+
+        OffersPage offersPage = new OffersPage(driver);
+
+        assertTrue(
+                offersPage.isCreateOfferButtonVisible(),
+                "Create Volunteer Offer button should be visible"
+        );
+
+        offersPage.clickCreateOfferButton();
+
+        CreateOfferPage createOfferPage = new CreateOfferPage(driver);
+
+        assertTrue(
+                createOfferPage.isTitleInputVisible(),
+                "Create Offer form should be visible"
+        );
+
+        createOfferPage.enterDescription("Test description for offer without title");
+        createOfferPage.enterCity("Lörrach");
+        createOfferPage.enterCountry("Germany");
+        createOfferPage.enterLatitude("47.614");
+        createOfferPage.enterLongitude("7.664");
+        createOfferPage.enterTags("test, automation");
+
+        createOfferPage.clickCreateButton();
+
+        assertTrue(
+                createOfferPage.isTitleInputVisible(),
+                "Create Offer form should remain open when title is missing"
+        );
+    }
+
+    @Test
+    public void loggedInUserShouldNotCreateOfferWithoutDescription() {
+        driver.get(ConfigReader.get("base.url"));
+
+        NavigationBar navigationBar = new NavigationBar(driver);
+        navigationBar.clickLogin();
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(
+                ConfigReader.get("admin.email"),
+                ConfigReader.get("admin.password")
+        );
+
+        AccountPage accountPage = new AccountPage(driver);
+
+        assertTrue(
+                accountPage.isLogoutButtonVisible(),
+                "Logout button should be visible after login"
+        );
+
+        navigationBar.clickOffers();
+
+        OffersPage offersPage = new OffersPage(driver);
+
+        assertTrue(
+                offersPage.isCreateOfferButtonVisible(),
+                "Create Volunteer Offer button should be visible"
+        );
+
+        offersPage.clickCreateOfferButton();
+
+        CreateOfferPage createOfferPage = new CreateOfferPage(driver);
+
+        assertTrue(
+                createOfferPage.isDescriptionTextareaVisible(),
+                "Create Offer form should be visible"
+        );
+
+        createOfferPage.enterTitle("Test offer without description");
+        createOfferPage.enterCity("Lörrach");
+        createOfferPage.enterCountry("Germany");
+        createOfferPage.enterLatitude("47.614");
+        createOfferPage.enterLongitude("7.664");
+        createOfferPage.enterTags("test, automation");
+
+        createOfferPage.clickCreateButton();
+
+        assertTrue(
+                createOfferPage.isDescriptionTextareaVisible(),
+                "Create Offer form should remain open when description is missing"
+        );
+    }
 }

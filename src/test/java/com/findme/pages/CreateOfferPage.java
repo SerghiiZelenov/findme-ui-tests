@@ -171,4 +171,46 @@ public class CreateOfferPage {
             );
         }
     }
+
+    public void enterDescription(String description) {
+        WebElement input = waitUntilVisibleElement(descriptionTextarea);
+        input.clear();
+        input.sendKeys(description);
+    }
+
+    public void enterCity(String city) {
+        WebElement input = waitUntilVisibleElement(cityInput);
+        input.clear();
+        input.sendKeys(city);
+    }
+
+    public void enterCountry(String country) {
+        WebElement input = waitUntilVisibleElement(countryInput);
+        input.clear();
+        input.sendKeys(country);
+    }
+
+    public void enterLatitude(String latitude) {
+        WebElement input = waitUntilVisibleElement(latitudeInput);
+        input.clear();
+        input.sendKeys(latitude);
+    }
+
+    public void enterLongitude(String longitude) {
+        WebElement input = waitUntilVisibleElement(longitudeInput);
+        input.clear();
+        input.sendKeys(longitude);
+    }
+
+    public void enterTags(String tags) {
+        WebElement input = waitUntilVisibleElement(tagsInput);
+        input.clear();
+        input.sendKeys(tags);
+    }
+
+    public void enterTitle(String title) {
+        WebElement input = waitUntilVisibleElement(titleInput);
+        input.clear();
+        input.sendKeys(title);
+    }
 }

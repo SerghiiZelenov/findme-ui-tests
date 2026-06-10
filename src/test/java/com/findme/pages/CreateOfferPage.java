@@ -27,7 +27,25 @@ public class CreateOfferPage {
     private final By findCoordinatesButton = By.xpath("//button[normalize-space()='Find Coordinates']");
     private final By activeOfferLabel = By.xpath("//*[normalize-space()='Active Offer']");
     private final By createButton = By.xpath("//button[normalize-space()='Create']");
-    private final By cancelButton = By.xpath("//button[normalize-space()='Cancel']");
+    private final By cancelButton = By.xpath("//form//button[@type='button' and normalize-space()='Cancel']");
+
+    private WebElement waitUntilVisibleElement(By locator) {
+        return wait.until(driver -> {
+            List<WebElement> elements = driver.findElements(locator);
+
+            for (WebElement element : elements) {
+                try {
+                    if (element.isDisplayed()) {
+                        return element;
+                    }
+                } catch (StaleElementReferenceException e) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
+    }
 
     public CreateOfferPage(WebDriver driver) {
         this.driver = driver;
@@ -100,6 +118,41 @@ public class CreateOfferPage {
                 return false;
             });
 
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public void clickCancelButton() {
+        WebElement button = waitUntilVisibleElement(cancelButton);
+
+        try {
+            button.click();
+        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript(
+                    "arguments[0].click();",
+                    button
+            );
+        }
+    }
+
+    public boolean isTitleInputNotVisible() {
+        try {
+            wait.until(driver -> {
+                List<WebElement> elements = driver.findElements(titleInput);
+
+                for (WebElement element : elements) {
+                    try {
+                        if (element.isDisplayed()) {
+                            return false;
+                        }
+                    } catch (StaleElementReferenceException e) {
+                        return true;
+                    }
+                }
+                return true;
+            });
             return true;
         } catch (TimeoutException e) {
             return false;

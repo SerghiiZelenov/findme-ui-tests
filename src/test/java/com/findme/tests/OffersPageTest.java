@@ -6,7 +6,6 @@ import com.findme.pages.AccountPage;
 import com.findme.pages.LoginPage;
 import com.findme.pages.NavigationBar;
 import com.findme.pages.OffersPage;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import com.findme.pages.CreateOfferPage;
 
@@ -56,8 +55,7 @@ public class OffersPageTest extends BaseTest {
                 "Password input should be visible after guest clicks Create Volunteer Offer"
         );
     }
-
-    //@Disabled("Investigation: Create Volunteer Offer form works manually, but Selenium does not open/verify the form reliably yet")
+    
     @Test
     public void loggedInUserShouldOpenCreateVolunteerOfferForm() {
         driver.get(ConfigReader.get("base.url"));

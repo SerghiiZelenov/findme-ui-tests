@@ -6,6 +6,7 @@ import com.findme.pages.AccountPage;
 import com.findme.pages.LoginPage;
 import com.findme.pages.NavigationBar;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,10 +39,16 @@ public class AccessControlTest extends BaseTest {
         navigationBar.clickLogin();
 
         LoginPage loginPage = new LoginPage(driver);
-        loginPage.login(
-                ConfigReader.get("user.email"),
-                ConfigReader.get("user.password")
+        String userEmail = System.getenv("FINDME_USER_EMAIL");
+        String userPassword = System.getenv("FINDME_USER_PASSWORD");
+
+        assumeTrue(
+                userEmail != null && !userEmail.isBlank()
+                        && userPassword != null && !userPassword.isBlank(),
+                "Regular user credentials are not provided. Set FINDME_USER_EMAIL and FINDME_USER_PASSWORD."
         );
+
+        loginPage.login(userEmail, userPassword);
 
         AccountPage accountPage = new AccountPage(driver);
 

@@ -152,4 +152,50 @@ public class CreateOfferTest extends BaseTest {
                 "Create Offer form should be closed after clicking Cancel"
         );
     }
+
+    @Test
+    public void loggedInUserShouldNotCreateOfferWithEmptyRequiredFields() {
+        driver.get(ConfigReader.get("base.url"));
+
+        NavigationBar navigationBar = new NavigationBar(driver);
+        navigationBar.clickLogin();
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(
+                ConfigReader.get("admin.email"),
+                ConfigReader.get("admin.password")
+        );
+
+        AccountPage accountPage = new AccountPage(driver);
+
+        assertTrue(
+                accountPage.isLogoutButtonVisible(),
+                "Logout button should be visible after login"
+        );
+
+        navigationBar.clickOffers();
+
+        OffersPage offersPage = new OffersPage(driver);
+
+        assertTrue(
+                offersPage.isCreateOfferButtonVisible(),
+                "Create Volunteer Offer button should be visible"
+        );
+
+        offersPage.clickCreateOfferButton();
+
+        CreateOfferPage createOfferPage = new CreateOfferPage(driver);
+
+        assertTrue(
+                createOfferPage.isTitleInputVisible(),
+                "Create Offer form should be visible before submitting empty form"
+        );
+
+        createOfferPage.clickCreateButton();
+
+        assertTrue(
+                createOfferPage.isTitleInputVisible(),
+                "Create Offer form should remain open after submitting empty required fields"
+        );
+    }
 }

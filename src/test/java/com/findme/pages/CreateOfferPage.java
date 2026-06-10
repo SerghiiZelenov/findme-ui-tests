@@ -26,7 +26,7 @@ public class CreateOfferPage {
     private final By useCurrentLocationButton = By.xpath("//button[normalize-space()='Use Current Location']");
     private final By findCoordinatesButton = By.xpath("//button[normalize-space()='Find Coordinates']");
     private final By activeOfferLabel = By.xpath("//*[normalize-space()='Active Offer']");
-    private final By createButton = By.xpath("//button[normalize-space()='Create']");
+    private final By createButton = By.cssSelector("button[type='submit']");
     private final By cancelButton = By.xpath("//form//button[@type='button' and normalize-space()='Cancel']");
 
     private WebElement waitUntilVisibleElement(By locator) {
@@ -156,6 +156,19 @@ public class CreateOfferPage {
             return true;
         } catch (TimeoutException e) {
             return false;
+        }
+    }
+
+    public void clickCreateButton() {
+        WebElement button = waitUntilVisibleElement(createButton);
+
+        try {
+            button.click();
+        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript(
+                    "arguments[0].click();",
+                    button
+            );
         }
     }
 }
